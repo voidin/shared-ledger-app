@@ -1,7 +1,7 @@
-import UserModel from '../models/user.js';
-import { success, error } from '../utils/response.js';
+const UserModel = require('../models/user.js');
+const { success, error } = require('../utils/response.js');
 
-export async function getProfile(req, res) {
+async function getProfile(req, res) {
   try {
     const userId = req.user.userId;
 
@@ -25,7 +25,7 @@ export async function getProfile(req, res) {
   }
 }
 
-export async function updateProfile(req, res) {
+async function updateProfile(req, res) {
   try {
     const userId = req.user.userId;
     const { nickname, avatar } = req.body;
@@ -74,7 +74,7 @@ export async function updateProfile(req, res) {
   }
 }
 
-export default {
+module.exports = {
   getProfile,
   updateProfile
 };

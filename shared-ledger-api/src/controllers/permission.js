@@ -1,7 +1,7 @@
-import Joi from 'joi';
-import { PermissionModel } from '../models/ledgerPermission.js';
-import { UserModel } from '../models/user.js';
-import { success, error } from '../utils/response.js';
+const Joi = require('joi');
+const { PermissionModel } = require('../models/ledgerPermission.js');
+const { UserModel } = require('../models/user.js');
+const { success, error } = require('../utils/response.js');
 
 const updatePermissionSchema = Joi.object({
   role: Joi.number().valid(1, 2, 3).optional(),
@@ -12,7 +12,7 @@ const updatePermissionSchema = Joi.object({
   can_export: Joi.number().valid(0, 1, 2).optional()
 });
 
-export async function getMemberPermissions(req, res, next) {
+async function getMemberPermissions(req, res, next) {
   try {
     const ledgerId = parseInt(req.params.id);
     const memberId = parseInt(req.params.memberId);
@@ -50,7 +50,7 @@ export async function getMemberPermissions(req, res, next) {
   }
 }
 
-export async function getAllPermissions(req, res, next) {
+async function getAllPermissions(req, res, next) {
   try {
     const ledgerId = parseInt(req.params.id);
     const userId = req.user.id;
@@ -85,7 +85,7 @@ export async function getAllPermissions(req, res, next) {
   }
 }
 
-export async function updateMemberPermissions(req, res, next) {
+async function updateMemberPermissions(req, res, next) {
   try {
     const ledgerId = parseInt(req.params.id);
     const memberId = parseInt(req.params.memberId);
@@ -125,7 +125,7 @@ export async function updateMemberPermissions(req, res, next) {
   }
 }
 
-export async function removeMember(req, res, next) {
+async function removeMember(req, res, next) {
   try {
     const ledgerId = parseInt(req.params.id);
     const memberId = parseInt(req.params.memberId);
@@ -157,7 +157,7 @@ export async function removeMember(req, res, next) {
   }
 }
 
-export default {
+module.exports = {
   getMemberPermissions,
   getAllPermissions,
   updateMemberPermissions,

@@ -19,6 +19,8 @@ router.use('/user', userRoutes);
 
 router.use('/ledgers', ledgerRoutes);
 
+router.use('/ledgers/:id/transactions', transactionRoutes);
+
 router.use('/ledgers/:id/virtual-members', virtualMemberRoutes);
 
 router.use('/ledgers/:id/members', permissionRoutes);

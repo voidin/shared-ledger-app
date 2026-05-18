@@ -1,6 +1,6 @@
-import LedgerModel from '../models/ledger.js';
-import LedgerMemberModel from '../models/ledgerMember.js';
-import { success, error, created } from '../utils/response.js';
+const LedgerModel = require('../models/ledger.js');
+const LedgerMemberModel = require('../models/ledgerMember.js');
+const { success, error, created } = require('../utils/response.js');
 
 const ROLE_CREATOR = 1;
 const ROLE_ADMIN = 2;
@@ -22,7 +22,7 @@ async function isCreator(ledgerId, userId) {
   return checkPermission(ledgerId, userId, [ROLE_CREATOR]);
 }
 
-export async function createLedger(req, res) {
+async function createLedger(req, res) {
   try {
     const userId = req.user.userId;
     const { name, description, type, auto_lock_days } = req.body;
@@ -52,11 +52,12 @@ export async function createLedger(req, res) {
     return created(res, ledger, '账本创建成功');
   } catch (err) {
     console.error('Create ledger error:', err);
+    console.error('Error details:', err.message, err.stack);
     return error(res, '创建账本失败，请稍后重试', 500);
   }
 }
 
-export async function getMyLedgers(req, res) {
+async function getMyLedgers(req, res) {
   try {
     const userId = req.user.userId;
     const ledgers = await LedgerModel.findUserLedgers(userId);
@@ -68,7 +69,7 @@ export async function getMyLedgers(req, res) {
   }
 }
 
-export async function getLedgerById(req, res) {
+async function getLedgerById(req, res) {
   try {
     const userId = req.user.userId;
     const { id } = req.params;
@@ -95,7 +96,7 @@ export async function getLedgerById(req, res) {
   }
 }
 
-export async function updateLedger(req, res) {
+async function updateLedger(req, res) {
   try {
     const userId = req.user.userId;
     const { id } = req.params;
@@ -136,7 +137,7 @@ export async function updateLedger(req, res) {
   }
 }
 
-export async function deleteLedger(req, res) {
+async function deleteLedger(req, res) {
   try {
     const userId = req.user.userId;
     const { id } = req.params;
@@ -159,7 +160,7 @@ export async function deleteLedger(req, res) {
   }
 }
 
-export async function joinLedger(req, res) {
+async function joinLedger(req, res) {
   try {
     const userId = req.user.userId;
     const { invite_code } = req.body;
@@ -196,7 +197,7 @@ export async function joinLedger(req, res) {
   }
 }
 
-export async function getMembers(req, res) {
+async function getMembers(req, res) {
   try {
     const userId = req.user.userId;
     const { id } = req.params;
@@ -231,7 +232,7 @@ export async function getMembers(req, res) {
   }
 }
 
-export async function removeMember(req, res) {
+async function removeMember(req, res) {
   try {
     const userId = req.user.userId;
     const { id, userId: targetUserId } = req.params;
@@ -270,7 +271,7 @@ export async function removeMember(req, res) {
   }
 }
 
-export async function updateMemberRole(req, res) {
+async function updateMemberRole(req, res) {
   try {
     const userId = req.user.userId;
     const { id, userId: targetUserId } = req.params;
@@ -330,7 +331,7 @@ function getRoleName(role) {
   }
 }
 
-export default {
+module.exports = {
   createLedger,
   getMyLedgers,
   getLedgerById,

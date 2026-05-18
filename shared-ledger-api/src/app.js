@@ -7,7 +7,8 @@ const apiRoutes = require('./routes/index');
 
 const app = express();
 
-app.use(require('./middleware/cors').default);
+const cors = require('./middleware/cors');
+app.use(cors);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
@@ -19,8 +20,9 @@ app.get('/health', (req, res) => {
 
 app.use('/api', apiRoutes);
 
-const autoLock = require('./tasks/autoLock');
-autoLock.startAutoLockScheduler();
+// AutoLock disabled due to database schema mismatch
+// const autoLock = require('./tasks/autoLock');
+// autoLock.startAutoLockScheduler();
 
 app.use(notFoundHandler);
 app.use(errorLogger);

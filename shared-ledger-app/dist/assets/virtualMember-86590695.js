@@ -1,0 +1,1 @@
+import{g as a,p as u,a as l,d as m}from"./index-d5ec7ed3.js";function n(e,r){return u(`/ledger/${e}/virtual-member`,r)}function s(e){return a(`/ledger/${e}/virtual-member`)}function d(e,r,t){return l(`/ledger/${e}/virtual-member/${r}`,t)}function b(e,r){return m(`/ledger/${e}/virtual-member/${r}`)}export{n as c,b as d,s as g,d as u};

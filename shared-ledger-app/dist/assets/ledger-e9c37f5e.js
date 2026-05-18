@@ -1,0 +1,1 @@
+import{p as n,d as o,a as t}from"./index-d5ec7ed3.js";function u(e){return n("/ledgers/join",{inviteCode:e})}function a(e,r){return o(`/ledgers/${e}/members/${r}`)}function d(e,r,s){return t(`/ledgers/${e}/members/${r}`,{role:s})}export{u as j,a as r,d as u};

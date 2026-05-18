@@ -90,7 +90,7 @@
     <van-dialog
       v-model:show="showDeleteDialog"
       title="删除虚拟成员"
-      :message="`确定要删除虚拟成员"${currentMember?.name}"吗？`"
+      :message="deleteMessage"
       show-cancel-button
       @confirm="confirmDelete"
     />
@@ -98,7 +98,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { showToast, showConfirmDialog } from 'vant'
 import { useRouter, useRoute } from 'vue-router'
 import { getVirtualMembers, deleteVirtualMember } from '@/api/virtualMember'
@@ -112,6 +112,10 @@ const loading = ref(false)
 const virtualMembers = ref([])
 const showDeleteDialog = ref(false)
 const currentMember = ref(null)
+
+const deleteMessage = computed(() => {
+  return `确定要删除虚拟成员"${currentMember.value?.name}"吗？`
+})
 
 onMounted(async () => {
   await loadVirtualMembers()

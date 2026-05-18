@@ -1,6 +1,6 @@
-import { query } from '../config/database.js';
+const { query } = require('../config/database.js');
 
-export const CategoryModel = {
+const CategoryModel = {
   async findById(id) {
     const sql = 'SELECT * FROM categories WHERE id = ? AND status = 1';
     const rows = await query(sql, [id]);
@@ -104,7 +104,23 @@ export const CategoryModel = {
     const sql = 'SELECT COUNT(*) as count FROM categories WHERE ledger_id = ? AND status = 1';
     const rows = await query(sql, [ledgerId]);
     return rows[0].count;
+  },
+
+  async findAll(type) {
+    let sql = 'SELECT * FROM categories WHERE status = 1';
+    const params = [];
+    
+    if (type !== undefined) {
+      sql += ' AND type = ?';
+      params.push(type);
+    }
+    
+    sql += ' ORDER BY is_system DESC, sort ASC, created_at ASC';
+    return await query(sql, params);
   }
 };
 
-export default CategoryModel;
+module.exports = {
+  CategoryModel,
+  ...CategoryModel
+};

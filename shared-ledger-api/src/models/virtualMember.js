@@ -1,6 +1,6 @@
-import { query } from '../config/database.js';
+const { query } = require('../config/database.js');
 
-export const VirtualMemberModel = {
+const VirtualMemberModel = {
   async create(data) {
     const { ledger_id, name, avatar, type = 'expense', status = 1 } = data;
     const sql = `
@@ -147,4 +147,7 @@ export const VirtualMemberModel = {
   }
 };
 
-export default VirtualMemberModel;
+module.exports = {
+  VirtualMemberModel,
+  ...VirtualMemberModel
+};

@@ -1,5 +1,5 @@
-import { format } from 'date-fns';
-import { toZonedTime } from 'date-fns-tz';
+const { format } = require('date-fns');
+const { toZonedTime } = require('date-fns-tz');
 
 const LOG_LEVELS = {
   error: 0,
@@ -25,7 +25,7 @@ function formatLog(level, message, meta = {}) {
   return JSON.stringify(logObject);
 }
 
-export function logger(level, message, meta = {}) {
+function logger(level, message, meta = {}) {
   if (shouldLog(level)) {
     const formattedLog = formatLog(level, message, meta);
     
@@ -39,7 +39,7 @@ export function logger(level, message, meta = {}) {
   }
 }
 
-export function requestLogger(req, res, next) {
+function requestLogger(req, res, next) {
   const start = Date.now();
   const { method, url, ip } = req;
 
@@ -68,7 +68,7 @@ export function requestLogger(req, res, next) {
   next();
 }
 
-export function errorLogger(error, req, res, next) {
+function errorLogger(error, req, res, next) {
   logger('error', error.message, {
     stack: error.stack,
     url: req.url,
@@ -78,7 +78,7 @@ export function errorLogger(error, req, res, next) {
   next(error);
 }
 
-export default {
+module.exports = {
   logger,
   requestLogger,
   errorLogger

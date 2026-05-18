@@ -139,7 +139,7 @@
     <van-dialog
       v-model:show="showDeleteDialog"
       title="删除分类"
-      :message="`确定要删除分类"${currentCategory?.name}"吗？`"
+      :message="deleteMessage"
       show-cancel-button
       @confirm="confirmDelete"
     />
@@ -147,7 +147,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { showToast, showConfirmDialog } from 'vant'
 import { useRouter, useRoute } from 'vue-router'
 import {
@@ -182,6 +182,10 @@ const iconOptions = [
   '🎁', '📚', '🎵', '💄', '🏋️', '☕', '🛒', '💰',
   '🍜', '🚕', '💡', '🎯', '🌸', '⭐', '🔥', '🎪'
 ]
+
+const deleteMessage = computed(() => {
+  return `确定要删除分类"${currentCategory.value?.name}"吗？`
+})
 
 onMounted(async () => {
   await loadCategories()

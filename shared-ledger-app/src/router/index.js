@@ -28,6 +28,18 @@ const routes = [
     meta: { title: '加入账本', requiresAuth: true }
   },
   {
+    path: '/ledger/detail/:id',
+    name: 'LedgerDetail',
+    component: () => import('../pages/ledger/detail.vue'),
+    meta: { title: '账本详情', requiresAuth: true }
+  },
+  {
+    path: '/ledger/lock/:id',
+    name: 'LedgerLock',
+    component: () => import('../pages/ledger/lock.vue'),
+    meta: { title: '账本锁定', requiresAuth: true }
+  },
+  {
     path: '/ledger/:id/settings',
     name: 'LedgerSettings',
     component: () => import('../pages/ledger/settings.vue'),
@@ -38,54 +50,6 @@ const routes = [
     name: 'LedgerMembers',
     component: () => import('../pages/ledger/members.vue'),
     meta: { title: '成员管理', requiresAuth: true }
-  },
-  {
-    path: '/add-expense',
-    name: 'AddExpense',
-    component: () => import('../views/expense/AddExpense.vue'),
-    meta: { title: '添加支出', requiresAuth: true }
-  },
-  {
-    path: '/expense-detail/:id',
-    name: 'ExpenseDetail',
-    component: () => import('../views/expense/ExpenseDetail.vue'),
-    meta: { title: '支出详情', requiresAuth: true }
-  },
-  {
-    path: '/expense-edit/:id',
-    name: 'ExpenseEdit',
-    component: () => import('../views/expense/ExpenseEdit.vue'),
-    meta: { title: '编辑支出', requiresAuth: true }
-  },
-  {
-    path: '/members',
-    name: 'Members',
-    component: () => import('../views/member/Members.vue'),
-    meta: { title: '成员管理', requiresAuth: true }
-  },
-  {
-    path: '/settlement',
-    name: 'Settlement',
-    component: () => import('../views/settlement/Settlement.vue'),
-    meta: { title: '结算', requiresAuth: true }
-  },
-  {
-    path: '/statistics',
-    name: 'Statistics',
-    component: () => import('../views/statistics/Statistics.vue'),
-    meta: { title: '统计', requiresAuth: true, tabbar: true }
-  },
-  {
-    path: '/profile',
-    name: 'Profile',
-    component: () => import('../views/profile/Profile.vue'),
-    meta: { title: '个人中心', requiresAuth: true, tabbar: true }
-  },
-  {
-    path: '/settings',
-    name: 'Settings',
-    component: () => import('../views/settings/Settings.vue'),
-    meta: { title: '设置', requiresAuth: true }
   },
   {
     path: '/transaction/add',
@@ -134,6 +98,30 @@ const routes = [
     name: 'CategoryList',
     component: () => import('../pages/category/list.vue'),
     meta: { title: '分类管理', requiresAuth: true }
+  },
+  {
+    path: '/export',
+    name: 'Export',
+    component: () => import('../pages/export/index.vue'),
+    meta: { title: '数据导出', requiresAuth: true }
+  },
+  {
+    path: '/statistics',
+    name: 'Statistics',
+    component: () => import('../pages/statistics/index.vue'),
+    meta: { title: '统计分析', requiresAuth: true }
+  },
+  {
+    path: '/mine',
+    name: 'Mine',
+    component: () => import('../pages/mine/index.vue'),
+    meta: { title: '我的', requiresAuth: true }
+  },
+  {
+    path: '/mine/profile',
+    name: 'Profile',
+    component: () => import('../pages/mine/profile.vue'),
+    meta: { title: '个人资料', requiresAuth: true }
   }
 ]
 

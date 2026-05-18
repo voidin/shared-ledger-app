@@ -1,6 +1,6 @@
-import { query, transaction } from '../config/database.js';
+const { query, transaction } = require('../config/database.js');
 
-export const LedgerMemberModel = {
+const LedgerMemberModel = {
   async addMember(ledgerId, userId, role = 3) {
     const existing = await this.findByLedgerAndUser(ledgerId, userId);
     if (existing) {
@@ -192,4 +192,7 @@ export const LedgerMemberModel = {
   }
 };
 
-export default LedgerMemberModel;
+module.exports = {
+  LedgerMemberModel,
+  ...LedgerMemberModel
+};

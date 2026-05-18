@@ -18,7 +18,7 @@ const CORS_OPTIONS = {
   optionsSuccessStatus: 200
 };
 
-export function cors(req, res, next) {
+function cors(req, res, next) {
   const origin = req.headers.origin;
   
   if (CORS_OPTIONS.origin) {
@@ -48,4 +48,4 @@ export function cors(req, res, next) {
   }
 }
 
-export default cors;
+module.exports = cors;

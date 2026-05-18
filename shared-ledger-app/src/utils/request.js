@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ElMessage } from 'element-plus'
+import { showToast } from 'vant'
 import { getToken, removeToken } from './storage'
 import router from '../router'
 
@@ -34,7 +34,7 @@ request.interceptors.response.use(
     }
     
     if (res.code && res.code !== 200 && res.code !== 0) {
-      ElMessage.error(res.message || '请求失败')
+      showToast(res.message || '请求失败')
       return Promise.reject(new Error(res.message || '请求失败'))
     }
     
@@ -47,26 +47,26 @@ request.interceptors.response.use(
       
       switch (status) {
         case 401:
-          ElMessage.error('登录已过期，请重新登录')
+          showToast('登录已过期，请重新登录')
           removeToken()
           router.push('/login')
           break
         case 403:
-          ElMessage.error('没有权限访问')
+          showToast('没有权限访问')
           break
         case 404:
-          ElMessage.error('请求的资源不存在')
+          showToast('请求的资源不存在')
           break
         case 500:
-          ElMessage.error('服务器内部错误')
+          showToast('服务器内部错误')
           break
         default:
-          ElMessage.error(message)
+          showToast(message)
       }
     } else if (error.request) {
-      ElMessage.error('网络连接失败，请检查网络')
+      showToast('网络连接失败，请检查网络')
     } else {
-      ElMessage.error(error.message || '请求配置错误')
+      showToast(error.message || '请求配置错误')
     }
     
     return Promise.reject(error)

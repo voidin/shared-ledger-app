@@ -1,6 +1,6 @@
-import { query, transaction } from '../config/database.js';
+const { query, transaction } = require('../config/database.js');
 
-export const PermissionModel = {
+const PermissionModel = {
   async findByMemberId(userId, ledgerId) {
     const sql = `
       SELECT * FROM ledger_permissions 
@@ -188,4 +188,7 @@ export const PermissionModel = {
   }
 };
 
-export default PermissionModel;
+module.exports = {
+  PermissionModel,
+  ...PermissionModel
+};

@@ -1,8 +1,8 @@
-import TransactionModel from '../models/transaction.js';
-import TransactionImageModel from '../models/transactionImage.js';
-import { success, created, error, paginate, noContent } from '../utils/response.js';
+const TransactionModel = require('../models/transaction.js');
+const TransactionImageModel = require('../models/transactionImage.js');
+const { success, created, error, paginate, noContent } = require('../utils/response.js');
 
-export const transactionController = {
+const transactionController = {
   async createTransaction(req, res, next) {
     try {
       const { id: ledgerId } = req.params;
@@ -12,11 +12,9 @@ export const transactionController = {
         amount,
         type,
         transaction_date,
-        description,
         remark,
         payee_id,
         is_virtual_payee,
-        virtual_payee_name,
         reimburse_status,
         images
       } = req.body;
@@ -35,37 +33,20 @@ export const transactionController = {
 
       const transaction = await TransactionModel.create({
         ledger_id: ledgerId,
+        user_id: userId,
         category_id,
-        creator_id: userId,
         amount,
         type,
         transaction_date,
-        description,
         remark,
         payee_id,
-        is_virtual_payee,
-        virtual_payee_name,
-        reimburse_status
+        is_virtual_payee: is_virtual_payee || 0,
+        reimburse_status: reimburse_status || 0
       });
 
-      if (images && images.length > 0) {
-        const imageRecords = images.map((img, index) => ({
-          transaction_id: transaction.id,
-          url: img.url,
-          filename: img.filename,
-          sort: img.sort || index
-        }));
-        await TransactionImageModel.createBatch(imageRecords);
-      }
-
-      const transactionWithImages = await TransactionModel.findByIdWithDetails(transaction.id);
-      const imageList = await TransactionImageModel.findByTransactionId(transaction.id);
-      
-      return created(res, {
-        ...transactionWithImages,
-        images: imageList
-      }, '账目创建成功');
+      return created(res, transaction, '账目创建成功');
     } catch (err) {
+      console.error('Create transaction error:', err);
       next(err);
     }
   },
@@ -93,17 +74,13 @@ export const transactionController = {
         keyword
       });
 
-      for (const item of result.list) {
-        const images = await TransactionImageModel.findByTransactionId(item.id);
-        item.images = images;
-      }
-
       return paginate(res, result.list, {
         page: result.page,
         pageSize: result.pageSize,
         total: result.total
       }, '获取账目列表成功');
     } catch (err) {
+      console.error('Get transactions error:', err);
       next(err);
     }
   },
@@ -112,16 +89,14 @@ export const transactionController = {
     try {
       const { id } = req.params;
 
-      const transaction = await TransactionModel.findByIdWithDetails(id);
+      const transaction = await TransactionModel.findById(id);
       if (!transaction) {
         return error(res, '账目不存在', 404);
       }
 
-      const images = await TransactionImageModel.findByTransactionId(id);
-      transaction.images = images;
-
       return success(res, transaction, '获取账目详情成功');
     } catch (err) {
+      console.error('Get transaction error:', err);
       next(err);
     }
   },
@@ -134,13 +109,10 @@ export const transactionController = {
         amount,
         type,
         transaction_date,
-        description,
         remark,
         payee_id,
         is_virtual_payee,
-        virtual_payee_name,
-        reimburse_status,
-        images
+        reimburse_status
       } = req.body;
 
       const existingTransaction = await TransactionModel.findById(id);
@@ -153,36 +125,15 @@ export const transactionController = {
       if (amount !== undefined) updateData.amount = amount;
       if (type !== undefined) updateData.type = type;
       if (transaction_date !== undefined) updateData.transaction_date = transaction_date;
-      if (description !== undefined) updateData.description = description;
       if (remark !== undefined) updateData.remark = remark;
       if (payee_id !== undefined) updateData.payee_id = payee_id;
       if (is_virtual_payee !== undefined) updateData.is_virtual_payee = is_virtual_payee;
-      if (virtual_payee_name !== undefined) updateData.virtual_payee_name = virtual_payee_name;
       if (reimburse_status !== undefined) updateData.reimburse_status = reimburse_status;
 
       const transaction = await TransactionModel.update(id, updateData);
-
-      if (images !== undefined) {
-        await TransactionImageModel.deleteByTransactionId(id);
-        if (images && images.length > 0) {
-          const imageRecords = images.map((img, index) => ({
-            transaction_id: id,
-            url: img.url,
-            filename: img.filename,
-            sort: img.sort || index
-          }));
-          await TransactionImageModel.createBatch(imageRecords);
-        }
-      }
-
-      const transactionWithDetails = await TransactionModel.findByIdWithDetails(id);
-      const imageList = await TransactionImageModel.findByTransactionId(id);
-      
-      return success(res, {
-        ...transactionWithDetails,
-        images: imageList
-      }, '账目更新成功');
+      return success(res, transaction, '账目更新成功');
     } catch (err) {
+      console.error('Update transaction error:', err);
       next(err);
     }
   },
@@ -196,8 +147,6 @@ export const transactionController = {
         return error(res, '账目不存在', 404);
       }
 
-      await TransactionImageModel.deleteByTransactionId(id);
-      
       const deleted = await TransactionModel.delete(id);
       if (!deleted) {
         return error(res, '账目删除失败', 400);
@@ -205,6 +154,7 @@ export const transactionController = {
 
       return noContent(res);
     } catch (err) {
+      console.error('Delete transaction error:', err);
       next(err);
     }
   },
@@ -227,17 +177,21 @@ export const transactionController = {
         return error(res, '账目不存在', 404);
       }
 
-      const success = await TransactionModel.markReimbursed(id, parseInt(reimburse_status));
-      if (!success) {
+      const successResult = await TransactionModel.markReimbursed(id, parseInt(reimburse_status));
+      if (!successResult) {
         return error(res, '报销状态更新失败', 400);
       }
 
-      const updatedTransaction = await TransactionModel.findByIdWithDetails(id);
+      const updatedTransaction = await TransactionModel.findById(id);
       return success(res, updatedTransaction, '报销状态更新成功');
     } catch (err) {
+      console.error('Mark reimbursed error:', err);
       next(err);
     }
   }
 };
 
-export default transactionController;
+module.exports = {
+  transactionController,
+  ...transactionController
+};

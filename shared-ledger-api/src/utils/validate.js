@@ -1,7 +1,7 @@
-import Joi from 'joi';
-import { AppError } from '../middleware/error.js';
+const Joi = require('joi');
+const { AppError } = require('../middleware/error.js');
 
-export function validate(schema, property = 'body') {
+function validate(schema, property = 'body') {
   return (req, res, next) => {
     const { error, value } = schema.validate(req[property], {
       abortEarly: false,
@@ -20,19 +20,19 @@ export function validate(schema, property = 'body') {
   };
 }
 
-export function validateBody(schema) {
+function validateBody(schema) {
   return validate(schema, 'body');
 }
 
-export function validateQuery(schema) {
+function validateQuery(schema) {
   return validate(schema, 'query');
 }
 
-export function validateParams(schema) {
+function validateParams(schema) {
   return validate(schema, 'params');
 }
 
-export const schemas = {
+const schemas = {
   object: () => Joi.object(),
   string: () => Joi.string(),
   number: () => Joi.number(),
@@ -46,7 +46,7 @@ export const schemas = {
   invitationCode: () => Joi.string().length(6).alphanum()
 };
 
-export default {
+module.exports = {
   validate,
   validateBody,
   validateQuery,

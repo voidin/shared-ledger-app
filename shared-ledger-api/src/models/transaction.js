@@ -1,6 +1,6 @@
-import { query, transaction } from '../config/database.js';
+const { query, transaction } = require('../config/database.js');
 
-export const TransactionModel = {
+const TransactionModel = {
   async findById(id) {
     const sql = 'SELECT * FROM transactions WHERE id = ? AND status = 1';
     const rows = await query(sql, [id]);
@@ -248,4 +248,7 @@ export const TransactionModel = {
   }
 };
 
-export default TransactionModel;
+module.exports = {
+  TransactionModel,
+  ...TransactionModel
+};

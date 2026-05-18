@@ -1,17 +1,21 @@
-import CategoryModel from '../models/category.js';
-import { success, created, error, noContent } from '../utils/response.js';
+const CategoryModel = require('../models/category.js');
+const { success, created, error, noContent } = require('../utils/response.js');
 
-export const categoryController = {
+const categoryController = {
   async getCategories(req, res, next) {
     try {
       const { id: ledgerId } = req.params;
-      const { include_system } = req.query;
+      const { include_system, type } = req.query;
 
       let categories;
-      if (include_system === 'true') {
-        categories = await CategoryModel.findByLedgerIdWithSystem(ledgerId);
+      if (ledgerId) {
+        if (include_system === 'true') {
+          categories = await CategoryModel.findByLedgerIdWithSystem(ledgerId);
+        } else {
+          categories = await CategoryModel.findByLedgerId(ledgerId);
+        }
       } else {
-        categories = await CategoryModel.findByLedgerId(ledgerId);
+        categories = await CategoryModel.findAll(type);
       }
 
       return success(res, categories, '获取分类列表成功');
@@ -23,18 +27,19 @@ export const categoryController = {
   async createCategory(req, res, next) {
     try {
       const { id: ledgerId } = req.params;
-      const { name, icon, color, sort } = req.body;
+      const { name, icon, color, sort, type } = req.body;
 
       if (!name) {
         return error(res, '分类名称不能为空', 400);
       }
 
       const category = await CategoryModel.create({
-        ledger_id: ledgerId,
+        ledger_id: ledgerId || 0,
         name,
         icon,
         color,
         sort,
+        type: type || 1,
         is_system: false
       });
 
@@ -100,4 +105,7 @@ export const categoryController = {
   }
 };
 
-export default categoryController;
+module.exports = {
+  categoryController,
+  ...categoryController
+};

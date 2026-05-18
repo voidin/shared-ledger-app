@@ -1,6 +1,6 @@
-import { query, transaction } from '../config/database.js';
+const { query, transaction } = require('../config/database.js');
 
-export const LedgerModel = {
+const LedgerModel = {
   async create({ name, description, type, creatorId, autoLockDays = null }) {
     const inviteCode = generateInviteCode();
     const autoLockAt = autoLockDays ? calculateAutoLockAt(autoLockDays) : null;
@@ -170,4 +170,7 @@ function calculateAutoLockAt(days) {
   return date;
 }
 
-export default LedgerModel;
+module.exports = {
+  LedgerModel,
+  ...LedgerModel
+};

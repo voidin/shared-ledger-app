@@ -1,21 +1,21 @@
-import { query } from '../config/database.js';
-import { PermissionModel } from '../models/ledgerPermission.js';
-import { AppError } from './error.js';
-import { error } from '../utils/response.js';
+const { query } = require('../config/database.js');
+const { PermissionModel } = require('../models/ledgerPermission.js');
+const { AppError } = require('./error.js');
+const { error } = require('../utils/response.js');
 
-export const PERMISSION_LEVEL = {
+const PERMISSION_LEVEL = {
   NONE: 0,
   ALL: 1,
   SELF_ONLY: 2
 };
 
-export const ROLE = {
+const ROLE = {
   CREATOR: 1,
   ADMIN: 2,
   MEMBER: 3
 };
 
-export async function checkLedgerAccess(req, res, next) {
+async function checkLedgerAccess(req, res, next) {
   try {
     const ledgerId = parseInt(req.params.id) || parseInt(req.params.ledgerId);
     const userId = req.user.id;
@@ -39,7 +39,7 @@ export async function checkLedgerAccess(req, res, next) {
   }
 }
 
-export async function checkLedgerLock(req, res, next) {
+async function checkLedgerLock(req, res, next) {
   try {
     const ledgerId = req.ledgerId || parseInt(req.params.id);
 
@@ -64,7 +64,7 @@ export async function checkLedgerLock(req, res, next) {
   }
 }
 
-export function checkPermission(action) {
+function checkPermission(action) {
   return async (req, res, next) => {
     try {
       const userId = req.user.id;
@@ -114,7 +114,7 @@ export function checkPermission(action) {
   };
 }
 
-export async function canAdd(req, res, next) {
+async function canAdd(req, res, next) {
   try {
     const userId = req.user.id;
     const ledgerId = req.ledgerId;
@@ -147,7 +147,7 @@ export async function canAdd(req, res, next) {
   }
 }
 
-export async function canEdit(req, res, next) {
+async function canEdit(req, res, next) {
   try {
     const userId = req.user.id;
     const ledgerId = req.ledgerId;
@@ -180,7 +180,7 @@ export async function canEdit(req, res, next) {
   }
 }
 
-export async function canDelete(req, res, next) {
+async function canDelete(req, res, next) {
   try {
     const userId = req.user.id;
     const ledgerId = req.ledgerId;
@@ -213,7 +213,7 @@ export async function canDelete(req, res, next) {
   }
 }
 
-export async function canReimburse(req, res, next) {
+async function canReimburse(req, res, next) {
   try {
     const userId = req.user.id;
     const ledgerId = req.ledgerId;
@@ -246,7 +246,7 @@ export async function canReimburse(req, res, next) {
   }
 }
 
-export async function canExport(req, res, next) {
+async function canExport(req, res, next) {
   try {
     const userId = req.user.id;
     const ledgerId = req.ledgerId;
@@ -270,7 +270,7 @@ export async function canExport(req, res, next) {
   }
 }
 
-export async function verifyEntryCreator(req, res, next) {
+async function verifyEntryCreator(req, res, next) {
   try {
     if (!req.creatorCheck) {
       return next();
@@ -313,7 +313,7 @@ export async function verifyEntryCreator(req, res, next) {
   }
 }
 
-export async function isLedgerCreator(req, res, next) {
+async function isLedgerCreator(req, res, next) {
   try {
     const userId = req.user.id;
     const ledgerId = req.ledgerId;
@@ -330,7 +330,7 @@ export async function isLedgerCreator(req, res, next) {
   }
 }
 
-export function requireRole(...roles) {
+function requireRole(...roles) {
   return async (req, res, next) => {
     try {
       const permission = req.ledgerPermission;
@@ -350,7 +350,7 @@ export function requireRole(...roles) {
   };
 }
 
-export default {
+module.exports = {
   PERMISSION_LEVEL,
   ROLE,
   checkLedgerAccess,

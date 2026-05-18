@@ -1,8 +1,8 @@
-import Joi from 'joi';
-import { VirtualMemberModel } from '../models/virtualMember.js';
-import { PermissionModel } from '../models/ledgerPermission.js';
-import { success, created, error } from '../utils/response.js';
-import { AppError } from '../middleware/error.js';
+const Joi = require('joi');
+const { VirtualMemberModel } = require('../models/virtualMember.js');
+const { PermissionModel } = require('../models/ledgerPermission.js');
+const { success, created, error } = require('../utils/response.js');
+const { AppError } = require('../middleware/error.js');
 
 const createVirtualMemberSchema = Joi.object({
   name: Joi.string().min(1).max(50).required(),
@@ -16,7 +16,7 @@ const updateVirtualMemberSchema = Joi.object({
   type: Joi.string().valid('payee', 'payer').optional()
 });
 
-export async function createVirtualMember(req, res, next) {
+async function createVirtualMember(req, res, next) {
   try {
     const ledgerId = parseInt(req.params.id);
     const userId = req.user.id;
@@ -49,7 +49,7 @@ export async function createVirtualMember(req, res, next) {
   }
 }
 
-export async function getVirtualMembers(req, res, next) {
+async function getVirtualMembers(req, res, next) {
   try {
     const ledgerId = parseInt(req.params.id);
     const userId = req.user.id;
@@ -68,7 +68,7 @@ export async function getVirtualMembers(req, res, next) {
   }
 }
 
-export async function updateVirtualMember(req, res, next) {
+async function updateVirtualMember(req, res, next) {
   try {
     const ledgerId = parseInt(req.params.id);
     const memberId = parseInt(req.params.mid);
@@ -108,7 +108,7 @@ export async function updateVirtualMember(req, res, next) {
   }
 }
 
-export async function deleteVirtualMember(req, res, next) {
+async function deleteVirtualMember(req, res, next) {
   try {
     const ledgerId = parseInt(req.params.id);
     const memberId = parseInt(req.params.mid);
@@ -145,7 +145,7 @@ export async function deleteVirtualMember(req, res, next) {
   }
 }
 
-export async function getPayees(req, res, next) {
+async function getPayees(req, res, next) {
   try {
     const ledgerId = parseInt(req.params.id);
     const userId = req.user.id;
@@ -163,7 +163,7 @@ export async function getPayees(req, res, next) {
   }
 }
 
-export default {
+module.exports = {
   createVirtualMember,
   getVirtualMembers,
   updateVirtualMember,

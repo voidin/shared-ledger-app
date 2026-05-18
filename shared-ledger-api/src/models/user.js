@@ -1,6 +1,6 @@
-import { query } from '../config/database.js';
+const { query } = require('../config/database.js');
 
-export const UserModel = {
+const UserModel = {
   async findByPhone(phone) {
     const sql = 'SELECT * FROM users WHERE phone = ? AND status = 1';
     const rows = await query(sql, [phone]);
@@ -74,4 +74,7 @@ export const UserModel = {
   }
 };
 
-export default UserModel;
+module.exports = {
+  UserModel,
+  ...UserModel
+};
