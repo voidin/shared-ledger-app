@@ -7,7 +7,7 @@ const LedgerMemberModel = {
       if (existing.status === 0) {
         const updateSql = `
           UPDATE ledger_members 
-          SET role = ?, joined_at = NOW(), updated_at = NOW()
+          SET role = ?, joined_at = datetime('now'), updated_at = datetime('now')
           WHERE id = ?
         `;
         await query(updateSql, [role, existing.id]);
@@ -18,7 +18,7 @@ const LedgerMemberModel = {
 
     const sql = `
       INSERT INTO ledger_members (ledger_id, user_id, role, joined_at, created_at, updated_at)
-      VALUES (?, ?, ?, NOW(), NOW(), NOW())
+      VALUES (?, ?, ?, datetime('now'), datetime('now'), datetime('now'))
     `;
     const result = await query(sql, [ledgerId, userId, role]);
     
@@ -46,7 +46,7 @@ const LedgerMemberModel = {
     
     const sql = 'DELETE FROM ledger_members WHERE ledger_id = ? AND user_id = ? AND role != 1';
     const result = await query(sql, [ledgerId, userId]);
-    return result.affectedRows > 0;
+    return result.changes > 0;
   },
 
   async updateRole(ledgerId, userId, newRole) {
@@ -63,14 +63,14 @@ const LedgerMemberModel = {
       throw new Error('无效的角色值');
     }
 
-    const sql = 'UPDATE ledger_members SET role = ?, updated_at = NOW() WHERE ledger_id = ? AND user_id = ? AND role != 1';
+    const sql = 'UPDATE ledger_members SET role = ?, updated_at = datetime('now') WHERE ledger_id = ? AND user_id = ? AND role != 1';
     const result = await query(sql, [newRole, ledgerId, userId]);
     
-    if (result.affectedRows > 0) {
+    if (result.changes > 0) {
       await this.updatePermissionsByRole(member.id, newRole);
     }
     
-    return result.affectedRows > 0;
+    return result.changes > 0;
   },
 
   async findByLedgerId(ledgerId) {
@@ -120,7 +120,7 @@ const LedgerMemberModel = {
 
     const sql = `
       INSERT INTO ledger_permissions (ledger_id, member_id, can_add, can_edit, can_delete, can_reimburse, can_export, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+      VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
     `;
     const member = await this.findByMemberId(memberId);
     await query(sql, [member.ledger_id, memberId, canAdd, canEdit, canDelete, canReimburse, canExport]);
@@ -137,7 +137,7 @@ const LedgerMemberModel = {
     
     const sql = `
       UPDATE ledger_permissions 
-      SET can_reimburse = ?, updated_at = NOW()
+      SET can_reimburse = ?, updated_at = datetime('now')
       WHERE member_id = ?
     `;
     await query(sql, [canReimburse, memberId]);
@@ -178,13 +178,13 @@ const LedgerMemberModel = {
       return this.getPermissions(memberId);
     }
 
-    fields.push('updated_at = NOW()');
+    fields.push('updated_at = datetime('now')');
     values.push(memberId);
 
     const sql = `UPDATE ledger_permissions SET ${fields.join(', ')} WHERE member_id = ?`;
     const result = await query(sql, values);
 
-    if (result.affectedRows === 0) {
+    if (result.changes === 0) {
       return null;
     }
 

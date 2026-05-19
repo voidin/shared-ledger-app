@@ -197,13 +197,13 @@ const TransactionModel = {
       return null;
     }
 
-    fields.push('updated_at = NOW()');
+    fields.push('updated_at = datetime('now')');
     values.push(id);
 
     const sql = `UPDATE transactions SET ${fields.join(', ')} WHERE id = ? AND status = 1`;
     const result = await query(sql, values);
 
-    if (result.affectedRows === 0) {
+    if (result.changes === 0) {
       return null;
     }
 
@@ -211,15 +211,15 @@ const TransactionModel = {
   },
 
   async delete(id) {
-    const sql = 'UPDATE transactions SET status = 0, updated_at = NOW() WHERE id = ? AND status = 1';
+    const sql = 'UPDATE transactions SET status = 0, updated_at = datetime('now') WHERE id = ? AND status = 1';
     const result = await query(sql, [id]);
-    return result.affectedRows > 0;
+    return result.changes > 0;
   },
 
   async markReimbursed(id, reimburseStatus) {
-    const sql = 'UPDATE transactions SET reimburse_status = ?, updated_at = NOW() WHERE id = ? AND status = 1';
+    const sql = 'UPDATE transactions SET reimburse_status = ?, updated_at = datetime('now') WHERE id = ? AND status = 1';
     const result = await query(sql, [reimburseStatus, id]);
-    return result.affectedRows > 0;
+    return result.changes > 0;
   },
 
   async countByLedgerId(ledgerId) {

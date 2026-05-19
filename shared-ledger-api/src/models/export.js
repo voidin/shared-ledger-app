@@ -7,7 +7,7 @@ const ExportModel = {
     const sql = `
       INSERT INTO export_records 
       (id, ledger_id, user_id, filename, file_path, record_count, filters, file_size, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
     `;
     
     await query(sql, [
@@ -121,22 +121,22 @@ const ExportModel = {
   async delete(id) {
     const sql = 'DELETE FROM export_records WHERE id = ?';
     const result = await query(sql, [id]);
-    return result.affectedRows > 0;
+    return result.changes > 0;
   },
 
   async deleteByLedgerId(ledgerId) {
     const sql = 'DELETE FROM export_records WHERE ledger_id = ?';
     const result = await query(sql, [ledgerId]);
-    return result.affectedRows;
+    return result.changes;
   },
 
   async deleteOldExports(days = 30) {
     const sql = `
       DELETE FROM export_records 
-      WHERE created_at < DATE_SUB(NOW(), INTERVAL ? DAY)
+      WHERE created_at < DATE_SUB(datetime('now'), INTERVAL ? DAY)
     `;
     const result = await query(sql, [days]);
-    return result.affectedRows;
+    return result.changes;
   },
 
   async getStats(ledgerId = null) {

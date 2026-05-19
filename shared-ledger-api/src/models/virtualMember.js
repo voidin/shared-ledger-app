@@ -5,7 +5,7 @@ const VirtualMemberModel = {
     const { ledger_id, name, avatar, type = 'expense', status = 1 } = data;
     const sql = `
       INSERT INTO virtual_members (ledger_id, name, avatar, type, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, NOW(), NOW())
+      VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))
     `;
     const result = await query(sql, [ledger_id, name, avatar || null, type, status]);
     return {
@@ -67,13 +67,13 @@ const VirtualMemberModel = {
       return null;
     }
 
-    fields.push('updated_at = NOW()');
+    fields.push('updated_at = datetime('now')');
     values.push(id);
 
     const sql = `UPDATE virtual_members SET ${fields.join(', ')} WHERE id = ? AND status = 1`;
     const result = await query(sql, values);
 
-    if (result.affectedRows === 0) {
+    if (result.changes === 0) {
       return null;
     }
 
@@ -81,9 +81,9 @@ const VirtualMemberModel = {
   },
 
   async delete(id) {
-    const sql = 'UPDATE virtual_members SET status = 0, updated_at = NOW() WHERE id = ? AND status = 1';
+    const sql = 'UPDATE virtual_members SET status = 0, updated_at = datetime('now') WHERE id = ? AND status = 1';
     const result = await query(sql, [id]);
-    return result.affectedRows > 0;
+    return result.changes > 0;
   },
 
   async hasAssociatedEntries(memberId) {

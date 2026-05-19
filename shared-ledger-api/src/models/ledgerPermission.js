@@ -40,7 +40,7 @@ const PermissionModel = {
         ledger_id, user_id, role, can_add, can_edit, can_delete, 
         can_reimburse, can_export, status, created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
     `;
     const result = await query(sql, [
       ledger_id, user_id, role, can_add, can_edit, can_delete,
@@ -100,7 +100,7 @@ const PermissionModel = {
       return null;
     }
 
-    fields.push('updated_at = NOW()');
+    fields.push('updated_at = datetime('now')');
     values.push(userId);
     values.push(ledgerId);
 
@@ -111,7 +111,7 @@ const PermissionModel = {
     `;
     const result = await query(sql, values);
 
-    if (result.affectedRows === 0) {
+    if (result.changes === 0) {
       return null;
     }
 
@@ -121,21 +121,21 @@ const PermissionModel = {
   async deleteByMemberId(userId, ledgerId) {
     const sql = `
       UPDATE ledger_permissions 
-      SET status = 0, updated_at = NOW() 
+      SET status = 0, updated_at = datetime('now') 
       WHERE user_id = ? AND ledger_id = ? AND status = 1
     `;
     const result = await query(sql, [userId, ledgerId]);
-    return result.affectedRows > 0;
+    return result.changes > 0;
   },
 
   async deleteByLedgerId(ledgerId) {
     const sql = `
       UPDATE ledger_permissions 
-      SET status = 0, updated_at = NOW() 
+      SET status = 0, updated_at = datetime('now') 
       WHERE ledger_id = ? AND status = 1
     `;
     const result = await query(sql, [ledgerId]);
-    return result.affectedRows;
+    return result.changes;
   },
 
   async isCreator(userId, ledgerId) {
@@ -167,7 +167,7 @@ const PermissionModel = {
           await conn.execute(
             `UPDATE ledger_permissions 
              SET role = ?, can_add = ?, can_edit = ?, can_delete = ?, 
-                 can_reimburse = ?, can_export = ?, updated_at = NOW()
+                 can_reimburse = ?, can_export = ?, updated_at = datetime('now')
              WHERE user_id = ? AND ledger_id = ? AND status = 1`,
             [perm.role, perm.can_add, perm.can_edit, perm.can_delete,
              perm.can_reimburse, perm.can_export, perm.user_id, ledgerId]
@@ -177,7 +177,7 @@ const PermissionModel = {
             `INSERT INTO ledger_permissions 
              (ledger_id, user_id, role, can_add, can_edit, can_delete, 
               can_reimburse, can_export, status, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())`,
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))`,
             [ledgerId, perm.user_id, perm.role, perm.can_add, perm.can_edit,
              perm.can_delete, perm.can_reimburse, perm.can_export]
           );

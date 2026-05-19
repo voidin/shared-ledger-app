@@ -20,7 +20,7 @@ const TransactionImageModel = {
     const { transaction_id, url, filename, sort } = imageData;
     const sql = `
       INSERT INTO transaction_images (transaction_id, url, filename, sort, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, 1, NOW(), NOW())
+      VALUES (?, ?, ?, ?, 1, datetime('now'), datetime('now'))
     `;
     const result = await query(sql, [
       transaction_id,
@@ -65,15 +65,15 @@ const TransactionImageModel = {
   },
 
   async delete(id) {
-    const sql = 'UPDATE transaction_images SET status = 0, updated_at = NOW() WHERE id = ? AND status = 1';
+    const sql = 'UPDATE transaction_images SET status = 0, updated_at = datetime('now') WHERE id = ? AND status = 1';
     const result = await query(sql, [id]);
-    return result.affectedRows > 0;
+    return result.changes > 0;
   },
 
   async deleteByTransactionId(transactionId) {
-    const sql = 'UPDATE transaction_images SET status = 0, updated_at = NOW() WHERE transaction_id = ? AND status = 1';
+    const sql = 'UPDATE transaction_images SET status = 0, updated_at = datetime('now') WHERE transaction_id = ? AND status = 1';
     const result = await query(sql, [transactionId]);
-    return result.affectedRows;
+    return result.changes;
   },
 
   async countByTransactionId(transactionId) {

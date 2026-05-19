@@ -14,7 +14,7 @@ async function updateLockStatus(ledgerId, isLocked, lockedAt = null) {
     WHERE id = ?
   `;
   const result = await query(sql, [isLocked ? 1 : 0, lockedAt, ledgerId]);
-  return result.affectedRows > 0;
+  return result.changes > 0;
 }
 
 async function updateLockSettings(ledgerId, settings) {
@@ -29,7 +29,7 @@ async function updateLockSettings(ledgerId, settings) {
     settings.auto_lock_type || 'once',
     ledgerId
   ]);
-  return result.affectedRows > 0;
+  return result.changes > 0;
 }
 
 async function lockLedger(req, res) {

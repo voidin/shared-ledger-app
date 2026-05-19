@@ -7,7 +7,7 @@ const LedgerModel = {
 
     const sql = `
       INSERT INTO ledgers (name, description, type, invite_code, creator_id, auto_lock_days, auto_lock_at, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
+      VALUES (?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))
     `;
     const result = await query(sql, [name, description || null, type || 1, inviteCode, creatorId, autoLockDays, autoLockAt]);
     return {
@@ -78,13 +78,13 @@ const LedgerModel = {
       return this.findById(id);
     }
 
-    fields.push('updated_at = NOW()');
+    fields.push('updated_at = datetime('now')');
     values.push(id);
 
     const sql = `UPDATE ledgers SET ${fields.join(', ')} WHERE id = ? AND status = 1`;
     const result = await query(sql, values);
 
-    if (result.affectedRows === 0) {
+    if (result.changes === 0) {
       return null;
     }
 
@@ -92,29 +92,29 @@ const LedgerModel = {
   },
 
   async delete(id) {
-    const sql = 'UPDATE ledgers SET status = 0, updated_at = NOW() WHERE id = ? AND status = 1';
+    const sql = 'UPDATE ledgers SET status = 0, updated_at = datetime('now') WHERE id = ? AND status = 1';
     const result = await query(sql, [id]);
-    return result.affectedRows > 0;
+    return result.changes > 0;
   },
 
   async lock(id, userId) {
     const sql = `
       UPDATE ledgers 
-      SET is_locked = 1, locked_at = NOW(), locked_by = ?, updated_at = NOW()
+      SET is_locked = 1, locked_at = datetime('now'), locked_by = ?, updated_at = datetime('now')
       WHERE id = ? AND status = 1
     `;
     const result = await query(sql, [userId, id]);
-    return result.affectedRows > 0;
+    return result.changes > 0;
   },
 
   async unlock(id) {
     const sql = `
       UPDATE ledgers 
-      SET is_locked = 0, locked_at = NULL, locked_by = NULL, updated_at = NOW()
+      SET is_locked = 0, locked_at = NULL, locked_by = NULL, updated_at = datetime('now')
       WHERE id = ? AND status = 1
     `;
     const result = await query(sql, [id]);
-    return result.affectedRows > 0;
+    return result.changes > 0;
   },
 
   async findUserLedgers(userId) {
@@ -147,11 +147,11 @@ const LedgerModel = {
   async findAutoLockLedgers() {
     const sql = `
       UPDATE ledgers 
-      SET is_locked = 1, locked_at = NOW(), locked_by = NULL, updated_at = NOW()
-      WHERE auto_lock_at <= NOW() AND is_locked = 0 AND status = 1
+      SET is_locked = 1, locked_at = datetime('now'), locked_by = NULL, updated_at = datetime('now')
+      WHERE auto_lock_at <= datetime('now') AND is_locked = 0 AND status = 1
     `;
     const result = await query(sql);
-    return result.affectedRows;
+    return result.changes;
   }
 };
 

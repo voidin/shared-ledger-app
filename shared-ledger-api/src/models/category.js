@@ -38,7 +38,7 @@ const CategoryModel = {
     const { ledger_id, name, icon, color, sort, is_system } = categoryData;
     const sql = `
       INSERT INTO categories (ledger_id, name, icon, color, sort, is_system, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
+      VALUES (?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))
     `;
     const result = await query(sql, [
       ledger_id || null,
@@ -81,13 +81,13 @@ const CategoryModel = {
       return null;
     }
 
-    fields.push('updated_at = NOW()');
+    fields.push('updated_at = datetime('now')');
     values.push(id);
 
     const sql = `UPDATE categories SET ${fields.join(', ')} WHERE id = ? AND status = 1`;
     const result = await query(sql, values);
 
-    if (result.affectedRows === 0) {
+    if (result.changes === 0) {
       return null;
     }
 
@@ -95,9 +95,9 @@ const CategoryModel = {
   },
 
   async delete(id) {
-    const sql = 'UPDATE categories SET status = 0, updated_at = NOW() WHERE id = ? AND status = 1 AND is_system = 0';
+    const sql = 'UPDATE categories SET status = 0, updated_at = datetime('now') WHERE id = ? AND status = 1 AND is_system = 0';
     const result = await query(sql, [id]);
-    return result.affectedRows > 0;
+    return result.changes > 0;
   },
 
   async countByLedgerId(ledgerId) {
