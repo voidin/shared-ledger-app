@@ -10,7 +10,7 @@ async function getLedgerById(ledgerId) {
 async function checkUserAccess(ledgerId, userId) {
   const memberSql = `
     SELECT id FROM ledger_members 
-    WHERE ledger_id = ? AND user_id = ? AND status = 1
+    WHERE ledger_id = ? AND user_id = ?
     LIMIT 1
   `;
   const rows = await query(memberSql, [ledgerId, userId]);
@@ -111,10 +111,9 @@ async function getMemberStats(req, res) {
     const membersSql = `
       SELECT 
         m.id as member_id,
-        m.name as member_name,
-        m.type as member_type,
+        u.nickname as member_name,
         m.user_id,
-        m.avatar,
+        u.avatar,
         COALESCE(SUM(CASE WHEN t.type = 1 THEN t.amount ELSE 0 END), 0) as total_expense,
         COALESCE(SUM(CASE WHEN t.type = 2 THEN t.amount ELSE 0 END), 0) as total_income,
         COALESCE(SUM(CASE WHEN t.type = 1 AND t.creator_id = m.user_id THEN t.amount ELSE 0 END), 0) as paid_by_member,
@@ -124,9 +123,10 @@ async function getMemberStats(req, res) {
         COUNT(DISTINCT CASE WHEN t.type = 1 THEN t.id END) as expense_count,
         COUNT(DISTINCT CASE WHEN t.type = 2 THEN t.id END) as income_count
       FROM ledger_members m
-      LEFT JOIN transactions t ON t.ledger_id = m.ledger_id AND t.creator_id = m.user_id AND t.status = 1
-      WHERE m.ledger_id = ? AND m.status = 1
-      GROUP BY m.id, m.name, m.type, m.user_id, m.avatar
+      LEFT JOIN users u ON m.user_id = u.id
+      LEFT JOIN transactions t ON t.ledger_id = m.ledger_id AND t.creator_id = m.user_id
+      WHERE m.ledger_id = ?
+      GROUP BY m.id, u.nickname, m.user_id, u.avatar
       ORDER BY total_expense DESC
     `;
 
@@ -142,7 +142,6 @@ async function getMemberStats(req, res) {
       members: stats.map(s => ({
         member_id: s.member_id,
         member_name: s.member_name,
-        member_type: s.member_type,
         user_id: s.user_id,
         avatar: s.avatar,
         total_expense: parseFloat(s.total_expense) || 0,
@@ -199,7 +198,6 @@ async function getCategoryStats(req, res) {
         c.name as category_name,
         c.icon as category_icon,
         c.color as category_color,
-        c.parent_id,
         COALESCE(SUM(t.amount), 0) as total_amount,
         COUNT(t.id) as record_count,
         COALESCE(SUM(CASE WHEN t.reimburse_status = 1 THEN t.amount ELSE 0 END), 0) as pending_amount,
@@ -208,13 +206,13 @@ async function getCategoryStats(req, res) {
       FROM categories c
       LEFT JOIN transactions t ON t.category_id = c.id AND ${whereClause}
       WHERE c.status = 1 AND (c.ledger_id IS NULL OR c.ledger_id = ?)
-      GROUP BY c.id, c.name, c.icon, c.color, c.parent_id
+      GROUP BY c.id, c.name, c.icon, c.color
       HAVING total_amount > 0
       ORDER BY total_amount DESC
     `;
 
-    params.push(ledgerId);
-    const categories = await query(categoryStatsSql, params);
+    const categoryParams = [...params, ledgerId];
+    const categories = await query(categoryStatsSql, categoryParams);
 
     const totalSql = `
       SELECT COALESCE(SUM(amount), 0) as total
@@ -239,7 +237,6 @@ async function getCategoryStats(req, res) {
         category_name: c.category_name,
         category_icon: c.category_icon,
         category_color: c.category_color,
-        parent_id: c.parent_id,
         total_amount: parseFloat(c.total_amount) || 0,
         record_count: parseInt(c.record_count) || 0,
         percentage: total > 0 ? ((parseFloat(c.total_amount) || 0) / total * 100).toFixed(2) : 0,

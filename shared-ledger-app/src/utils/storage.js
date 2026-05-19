@@ -3,55 +3,55 @@ const USER_INFO_KEY = 'sl_user_info'
 const LEDGER_ID_KEY = 'sl_ledger_id'
 
 export function setToken(token) {
-  uni.setStorageSync(TOKEN_KEY, token)
+  localStorage.setItem(TOKEN_KEY, token)
 }
 
 export function getToken() {
-  return uni.getStorageSync(TOKEN_KEY) || ''
+  return localStorage.getItem(TOKEN_KEY) || ''
 }
 
 export function removeToken() {
-  uni.removeStorageSync(TOKEN_KEY)
+  localStorage.removeItem(TOKEN_KEY)
 }
 
 export function setUserInfo(userInfo) {
-  uni.setStorageSync(USER_INFO_KEY, JSON.stringify(userInfo))
+  localStorage.setItem(USER_INFO_KEY, JSON.stringify(userInfo))
 }
 
 export function getUserInfo() {
-  const info = uni.getStorageSync(USER_INFO_KEY)
+  const info = localStorage.getItem(USER_INFO_KEY)
   return info ? JSON.parse(info) : null
 }
 
 export function removeUserInfo() {
-  uni.removeStorageSync(USER_INFO_KEY)
+  localStorage.removeItem(USER_INFO_KEY)
 }
 
 export function setLedgerId(id) {
-  uni.setStorageSync(LEDGER_ID_KEY, id)
+  localStorage.setItem(LEDGER_ID_KEY, id)
 }
 
 export function getLedgerId() {
-  return uni.getStorageSync(LEDGER_ID_KEY) || ''
+  return localStorage.getItem(LEDGER_ID_KEY) || ''
 }
 
 export function removeLedgerId() {
-  uni.removeStorageSync(LEDGER_ID_KEY)
+  localStorage.removeItem(LEDGER_ID_KEY)
 }
 
 export function clearAll() {
-  uni.clearStorageSync()
+  localStorage.clear()
 }
 
 export function setStorage(key, value) {
   if (typeof value === 'object') {
     value = JSON.stringify(value)
   }
-  uni.setStorageSync(key, value)
+  localStorage.setItem(key, value)
 }
 
 export function getStorage(key) {
-  const value = uni.getStorageSync(key)
+  const value = localStorage.getItem(key)
   try {
     return JSON.parse(value)
   } catch {
@@ -60,5 +60,5 @@ export function getStorage(key) {
 }
 
 export function removeStorage(key) {
-  uni.removeStorageSync(key)
+  localStorage.removeItem(key)
 }

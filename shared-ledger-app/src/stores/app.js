@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { showToast as vantShowToast, showLoadingToast, closeToast, showConfirmDialog } from 'vant'
 
 export const useAppStore = defineStore('app', () => {
   const loading = ref(false)
@@ -9,20 +10,26 @@ export const useAppStore = defineStore('app', () => {
   const systemInfo = ref(null)
   
   function initApp() {
-    uni.getSystemInfo({
-      success: (res) => {
-        systemInfo.value = res
-        deviceInfo.value = {
-          platform: res.platform,
-          brand: res.brand,
-          model: res.model,
-          system: res.system,
-          version: res.version
-        }
-      }
-    })
+    // 浏览器环境下获取系统信息
+    systemInfo.value = {
+      platform: navigator.platform,
+      brand: '',
+      model: '',
+      system: navigator.userAgent,
+      version: navigator.appVersion,
+      statusBarHeight: 0,
+      safeAreaInsets: { bottom: 0 }
+    }
     
-    const savedTheme = uni.getStorageSync('app_theme')
+    deviceInfo.value = {
+      platform: navigator.platform,
+      brand: '',
+      model: '',
+      system: navigator.userAgent,
+      version: navigator.appVersion
+    }
+    
+    const savedTheme = localStorage.getItem('app_theme')
     if (savedTheme) {
       theme.value = savedTheme
       applyTheme(savedTheme)
@@ -37,37 +44,30 @@ export const useAppStore = defineStore('app', () => {
   function showLoading(text = '加载中...') {
     loading.value = true
     loadingText.value = text
-    uni.showLoading({
-      title: text,
-      mask: true
+    showLoadingToast({
+      message: text,
+      forbidClick: true,
+      duration: 0
     })
   }
   
   function hideLoading() {
     loading.value = false
     loadingText.value = ''
-    uni.hideLoading()
+    closeToast()
   }
   
   function setTheme(newTheme) {
     theme.value = newTheme
-    uni.setStorageSync('app_theme', newTheme)
+    localStorage.setItem('app_theme', newTheme)
     applyTheme(newTheme)
   }
   
   function applyTheme(themeName) {
     if (themeName === 'dark') {
-      uni.setBackgroundColor({
-        backgroundColor: '#1a1a1a',
-        backgroundColorTop: '#1a1a1a',
-        backgroundColorBottom: '#1a1a1a'
-      })
+      document.body.style.backgroundColor = '#1a1a1a'
     } else {
-      uni.setBackgroundColor({
-        backgroundColor: '#f5f5f5',
-        backgroundColorTop: '#f5f5f5',
-        backgroundColorBottom: '#f5f5f5'
-      })
+      document.body.style.backgroundColor = '#f5f5f5'
     }
   }
   
@@ -77,15 +77,15 @@ export const useAppStore = defineStore('app', () => {
   }
   
   function showToast(message, icon = 'none', duration = 2000) {
-    uni.showToast({
-      title: message,
+    vantShowToast({
+      message: message,
       icon: icon,
       duration: duration
     })
   }
   
   function showError(message) {
-    showToast(message, 'error')
+    showToast(message, 'fail')
   }
   
   function showSuccess(message) {
@@ -94,17 +94,19 @@ export const useAppStore = defineStore('app', () => {
   
   function showModal(options) {
     return new Promise((resolve, reject) => {
-      uni.showModal({
-        ...options,
-        success: (res) => {
-          if (res.confirm) {
-            resolve(true)
-          } else {
-            resolve(false)
-          }
-        },
-        fail: reject
+      showConfirmDialog({
+        title: options.title || '提示',
+        message: options.content || '',
+        showCancelButton: options.showCancel !== false,
+        confirmButtonText: options.confirmText || '确定',
+        cancelButtonText: options.cancelText || '取消'
       })
+        .then(() => {
+          resolve(true)
+        })
+        .catch(() => {
+          resolve(false)
+        })
     })
   }
   
@@ -117,16 +119,11 @@ export const useAppStore = defineStore('app', () => {
   }
   
   function getSafeAreaInsets() {
-    if (!systemInfo.value) return { top: 0, bottom: 0 }
-    return {
-      top: systemInfo.value.statusBarHeight || 0,
-      bottom: systemInfo.value.safeAreaInsets?.bottom || 0
-    }
+    return { top: 0, bottom: 0 }
   }
   
   function getNavBarHeight() {
-    if (!systemInfo.value) return 44
-    return systemInfo.value.statusBarHeight + 44
+    return 44
   }
   
   return {

@@ -8,12 +8,21 @@ const {
 } = require('../controllers/statistics.js');
 const { authenticate } = require('../middleware/auth.js');
 
-router.get('/summary', authenticate, getSummaryStats);
+function extractLedgerId(req, res, next) {
+  const urlParts = req.originalUrl.split('/');
+  const ledgersIndex = urlParts.findIndex(p => p === 'ledgers');
+  if (ledgersIndex !== -1 && urlParts[ledgersIndex + 1]) {
+    req.params.ledgerId = urlParts[ledgersIndex + 1];
+  }
+  next();
+}
 
-router.get('/by-member', authenticate, getMemberStats);
+router.get('/summary', authenticate, extractLedgerId, getSummaryStats);
 
-router.get('/by-category', authenticate, getCategoryStats);
+router.get('/by-member', authenticate, extractLedgerId, getMemberStats);
 
-router.get('/timeline', authenticate, getTimelineStats);
+router.get('/by-category', authenticate, extractLedgerId, getCategoryStats);
+
+router.get('/timeline', authenticate, extractLedgerId, getTimelineStats);
 
 module.exports = router;
