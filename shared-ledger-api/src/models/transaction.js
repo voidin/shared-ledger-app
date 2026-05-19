@@ -33,7 +33,7 @@ const TransactionModel = {
     const offset = (page - 1) * pageSize;
 
     let whereClause = 'WHERE t.ledger_id = ? AND t.status = 1';
-    const params = [ledgerId];
+    const params = [parseInt(ledgerId)];
 
     if (categoryId) {
       whereClause += ' AND t.category_id = ?';
@@ -64,6 +64,9 @@ const TransactionModel = {
     const countResult = await query(countSql, params);
     const total = countResult[0].total;
 
+    const safePageSize = Math.max(1, Math.min(100, parseInt(pageSize) || 20));
+    const safeOffset = Math.max(0, parseInt(offset) || 0);
+
     const sql = `
       SELECT 
         t.*,
@@ -80,10 +83,10 @@ const TransactionModel = {
       LEFT JOIN users p ON t.payee_id = p.id
       ${whereClause}
       ORDER BY t.transaction_date DESC, t.created_at DESC
-      LIMIT ? OFFSET ?
+      LIMIT ${safePageSize} OFFSET ${safeOffset}
     `;
 
-    const rows = await query(sql, [...params, pageSize, offset]);
+    const rows = await query(sql, params);
 
     return {
       list: rows,
@@ -94,10 +97,38 @@ const TransactionModel = {
   },
 
   async create(transactionData) {
-    const {
+    console.log('Transaction create called with:', JSON.stringify(transactionData));
+    const ledger_id = transactionData.ledger_id;
+    const category_id = transactionData.category_id || null;
+    const creator_id = transactionData.creator_id;
+    const user_id = transactionData.user_id || transactionData.creator_id;
+    const amount = transactionData.amount;
+    const type = transactionData.type;
+    const transaction_date = transactionData.transaction_date || new Date();
+    const description = transactionData.description || '';
+    const remark = transactionData.remark || null;
+    const payee_id = transactionData.payee_id || null;
+    const is_virtual_payee = transactionData.is_virtual_payee ? 1 : 0;
+    const virtual_payee_name = transactionData.virtual_payee_name || null;
+    const reimburse_status = transactionData.reimburse_status !== undefined ? transactionData.reimburse_status : (type === 2 ? 1 : 0);
+
+    console.log('Processed values:', { ledger_id, category_id, creator_id, user_id, amount, type, transaction_date });
+
+    const sql = `
+      INSERT INTO transactions (
+        ledger_id, category_id, creator_id, user_id, amount, type, 
+        transaction_date, description, remark, 
+        payee_id, is_virtual_payee, virtual_payee_name,
+        reimburse_status, status
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+    `;
+
+    const result = await query(sql, [
       ledger_id,
       category_id,
       creator_id,
+      user_id,
       amount,
       type,
       transaction_date,
@@ -107,37 +138,12 @@ const TransactionModel = {
       is_virtual_payee,
       virtual_payee_name,
       reimburse_status
-    } = transactionData;
-
-    const sql = `
-      INSERT INTO transactions (
-        ledger_id, category_id, creator_id, amount, type, 
-        transaction_date, description, remark, 
-        payee_id, is_virtual_payee, virtual_payee_name,
-        reimburse_status, status, created_at, updated_at
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
-    `;
-
-    const result = await query(sql, [
-      ledger_id,
-      category_id,
-      creator_id,
-      amount,
-      type,
-      transaction_date || new Date(),
-      description || '',
-      remark || null,
-      payee_id || null,
-      is_virtual_payee ? 1 : 0,
-      virtual_payee_name || null,
-      reimburse_status !== undefined ? reimburse_status : (type === 2 ? 1 : 0)
     ]);
 
     return {
       id: result.insertId,
       ...transactionData,
-      reimburse_status: reimburse_status !== undefined ? reimburse_status : (type === 2 ? 1 : 0),
+      reimburse_status,
       status: 1
     };
   },

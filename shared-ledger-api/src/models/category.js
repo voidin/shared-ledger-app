@@ -115,7 +115,7 @@ const CategoryModel = {
       params.push(type);
     }
     
-    sql += ' ORDER BY is_system DESC, sort ASC, created_at ASC';
+    sql += ' ORDER BY is_system DESC, created_at ASC';
     return await query(sql, params);
   }
 };

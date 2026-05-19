@@ -14,27 +14,18 @@ const uploadRoutes = require('./upload');
 const lockRoutes = require('./lock');
 
 router.use('/auth', authRoutes);
-
 router.use('/user', userRoutes);
+router.use('/categories', categoryRoutes);
+router.use('/exports', exportRoutes);
+router.use('/upload', uploadRoutes);
 
+router.use('/ledgers/:ledgerId/transactions', transactionRoutes);
+router.use('/ledgers/:ledgerId/virtual-members', virtualMemberRoutes);
+router.use('/ledgers/:ledgerId/members', permissionRoutes);
+router.use('/ledgers/:ledgerId/lock', lockRoutes);
+router.use('/ledgers/:ledgerId/statistics', statisticsRoutes);
 router.use('/ledgers', ledgerRoutes);
 
-router.use('/ledgers/:id/transactions', transactionRoutes);
-
-router.use('/ledgers/:id/virtual-members', virtualMemberRoutes);
-
-router.use('/ledgers/:id/members', permissionRoutes);
-
-router.use('/ledgers/:id', lockRoutes);
-
-router.use('/ledgers/:id', statisticsRoutes);
-
-router.use('/categories', categoryRoutes);
-
 router.use('/transactions', transactionRoutes);
-
-router.use('/exports', exportRoutes);
-
-router.use('/upload', uploadRoutes);
 
 module.exports = router;

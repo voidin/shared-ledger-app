@@ -5,8 +5,9 @@ const { success, created, error, paginate, noContent } = require('../utils/respo
 const transactionController = {
   async createTransaction(req, res, next) {
     try {
-      const { id: ledgerId } = req.params;
-      const userId = req.user.id;
+      const ledgerId = req.params.ledgerId;
+      const userId = req.user.userId;
+      console.log('Controller - ledgerId:', ledgerId, 'userId:', userId);
       const {
         category_id,
         amount,
@@ -33,13 +34,15 @@ const transactionController = {
 
       const transaction = await TransactionModel.create({
         ledger_id: ledgerId,
+        creator_id: userId,
         user_id: userId,
         category_id,
         amount,
         type,
         transaction_date,
-        remark,
-        payee_id,
+        description: '',
+        remark: remark || null,
+        payee_id: payee_id || null,
         is_virtual_payee: is_virtual_payee || 0,
         reimburse_status: reimburse_status || 0
       });
@@ -53,7 +56,8 @@ const transactionController = {
 
   async getTransactions(req, res, next) {
     try {
-      const { id: ledgerId } = req.params;
+      const ledgerId = req.params.ledgerId;
+      console.log('Controller getTransactions - ledgerId:', ledgerId);
       const {
         page = 1,
         pageSize = 20,

@@ -8,12 +8,12 @@ const {
 } = require('../controllers/statistics.js');
 const { authenticate } = require('../middleware/auth.js');
 
-router.get('/:id/stats/summary', authenticate, getSummaryStats);
+router.get('/summary', authenticate, getSummaryStats);
 
-router.get('/:id/stats/by-member', authenticate, getMemberStats);
+router.get('/by-member', authenticate, getMemberStats);
 
-router.get('/:id/stats/by-category', authenticate, getCategoryStats);
+router.get('/by-category', authenticate, getCategoryStats);
 
-router.get('/:id/stats/timeline', authenticate, getTimelineStats);
+router.get('/timeline', authenticate, getTimelineStats);
 
 module.exports = router;

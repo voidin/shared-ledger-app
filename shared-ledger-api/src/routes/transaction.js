@@ -3,7 +3,16 @@ const router = express.Router();
 const { authenticate } = require('../middleware/auth.js');
 const transactionController = require('../controllers/transaction.js');
 
-router.post('/', authenticate, async (req, res, next) => {
+function extractLedgerId(req, res, next) {
+  const urlParts = req.originalUrl.split('/');
+  const ledgersIndex = urlParts.findIndex(p => p === 'ledgers');
+  if (ledgersIndex !== -1 && urlParts[ledgersIndex + 1]) {
+    req.params.ledgerId = urlParts[ledgersIndex + 1];
+  }
+  next();
+}
+
+router.post('/', authenticate, extractLedgerId, async (req, res, next) => {
   try {
     await transactionController.createTransaction(req, res, next);
   } catch (err) {
@@ -12,7 +21,7 @@ router.post('/', authenticate, async (req, res, next) => {
   }
 });
 
-router.get('/', authenticate, async (req, res, next) => {
+router.get('/', authenticate, extractLedgerId, async (req, res, next) => {
   try {
     await transactionController.getTransactions(req, res, next);
   } catch (err) {

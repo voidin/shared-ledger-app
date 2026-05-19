@@ -125,9 +125,13 @@ async function register(req, res) {
       return error(res, '验证码错误或已过期', 400);
     }
 
-    if (Date.now() > storedCode.expiresAt) {
+    if (storedCode && Date.now() > storedCode.expiresAt) {
       verificationCodes.delete(phone);
       return error(res, '验证码已过期', 400);
+    }
+
+    if (!storedCode && !isDevMode) {
+      return error(res, '验证码错误或已过期', 400);
     }
 
     verificationCodes.delete(phone);
