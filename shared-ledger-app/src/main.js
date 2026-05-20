@@ -41,6 +41,9 @@ import {
   GridItem,
   Image as VanImage,
   DatePicker,
+  Checkbox,
+  CheckboxGroup,
+  Overlay,
   showToast,
   showConfirmDialog
 } from 'vant'
@@ -88,5 +91,8 @@ app.use(CollapseItem)
 app.use(Grid)
 app.use(GridItem)
 app.use(VanImage)
+app.use(Checkbox)
+app.use(CheckboxGroup)
+app.use(Overlay)
 
 app.mount('#app')

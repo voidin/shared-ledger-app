@@ -54,7 +54,7 @@ const UserModel = {
     fields.push("updated_at = datetime('now')");
     values.push(id);
 
-    const sql = `UPDATE users SET ${fields.join(', ')} WHERE id = ? AND status = 1';
+    const sql = `UPDATE users SET ${fields.join(', ')} WHERE id = ? AND status = 1`;
     const result = await query(sql, values);
 
     if (result.changes === 0) {
