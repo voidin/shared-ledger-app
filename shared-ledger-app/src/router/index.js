@@ -130,7 +130,7 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   document.title = to.meta.title ? `${to.meta.title} - 共享记账` : '共享记账'
   
   if (to.meta.requiresAuth) {
@@ -145,13 +145,15 @@ router.beforeEach((to, from, next) => {
     
     const userStore = useUserStore()
     if (!userStore.userInfo) {
-      userStore.getUserInfo().catch(() => {
+      try {
+        await userStore.getUserInfo()
+      } catch (error) {
         next({
           path: '/login',
           query: { redirect: to.fullPath }
         })
         return
-      })
+      }
     }
   }
   

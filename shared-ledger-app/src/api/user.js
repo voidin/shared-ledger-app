@@ -1,7 +1,7 @@
 import { get, put, upload } from '../utils/request'
 
 export function getUserInfo() {
-  return get('/user/info')
+  return get('/user/profile')
 }
 
 export function updateUserInfo(data) {

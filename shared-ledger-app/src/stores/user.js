@@ -14,15 +14,13 @@ export const useUserStore = defineStore('user', () => {
   
   async function login(loginData) {
     try {
-      const data = await post('/auth/login', loginData)
+      token.value = loginData.token
+      setToken(loginData.token)
       
-      token.value = data.token
-      setToken(data.token)
+      userInfo.value = loginData.userInfo
+      setUserInfo(loginData.userInfo)
       
-      userInfo.value = data.userInfo
-      setUserInfo(data.userInfo)
-      
-      return data
+      return loginData
     } catch (error) {
       console.error('登录失败:', error)
       throw error
