@@ -5,7 +5,7 @@ const ExportModel = {
     const { id, ledger_id, user_id, filename, file_path, record_count, filters, file_size } = data;
     
     const sql = `
-      INSERT INTO export_records 
+      INSERT INTO exports 
       (id, ledger_id, user_id, filename, file_path, record_count, filters, file_size, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
     `;
@@ -36,7 +36,7 @@ const ExportModel = {
         filters,
         file_size,
         created_at
-      FROM export_records 
+      FROM exports 
       WHERE id = ?
     `;
     
@@ -66,7 +66,7 @@ const ExportModel = {
         filters,
         file_size,
         created_at
-      FROM export_records 
+      FROM exports 
       WHERE ledger_id = ?
       ORDER BY created_at DESC
       LIMIT ?
@@ -98,7 +98,7 @@ const ExportModel = {
         filters,
         file_size,
         created_at
-      FROM export_records 
+      FROM exports 
       WHERE user_id = ?
       ORDER BY created_at DESC
       LIMIT ?
@@ -119,21 +119,21 @@ const ExportModel = {
   },
 
   async delete(id) {
-    const sql = 'DELETE FROM export_records WHERE id = ?';
+    const sql = 'DELETE FROM exports WHERE id = ?';
     const result = await query(sql, [id]);
     return result.changes > 0;
   },
 
   async deleteByLedgerId(ledgerId) {
-    const sql = 'DELETE FROM export_records WHERE ledger_id = ?';
+    const sql = 'DELETE FROM exports WHERE ledger_id = ?';
     const result = await query(sql, [ledgerId]);
     return result.changes;
   },
 
   async deleteOldExports(days = 30) {
     const sql = `
-      DELETE FROM export_records 
-      WHERE created_at < DATE_SUB(datetime('now'), INTERVAL ? DAY)
+      DELETE FROM exports 
+      WHERE created_at < datetime('now', '-' || ? || ' days')
     `;
     const result = await query(sql, [days]);
     return result.changes;
@@ -145,7 +145,7 @@ const ExportModel = {
         COUNT(*) as total_count,
         SUM(record_count) as total_records,
         SUM(file_size) as total_size
-      FROM export_records
+      FROM exports
     `;
     
     const params = [];
