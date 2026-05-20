@@ -8,7 +8,7 @@ const ExportModel = {
       INSERT INTO exports 
       (id, ledger_id, user_id, filename, file_path, record_count, filters, file_size, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
-    `;
+    ';
     
     await query(sql, [
       id,
@@ -17,7 +17,7 @@ const ExportModel = {
       filename,
       file_path,
       record_count,
-      filters || '{}',
+      filters || `{}',
       file_size || 0
     ]);
     
@@ -102,7 +102,7 @@ const ExportModel = {
       WHERE user_id = ?
       ORDER BY created_at DESC
       LIMIT ?
-    `;
+    ';
     
     const rows = await query(sql, [userId, limit]);
     
@@ -146,7 +146,7 @@ const ExportModel = {
         SUM(record_count) as total_records,
         SUM(file_size) as total_size
       FROM exports
-    `;
+    ';
     
     const params = [];
     if (ledgerId) {

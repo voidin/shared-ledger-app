@@ -2,7 +2,7 @@ const { query } = require('../config/database.js');
 
 const TransactionImageModel = {
   async findById(id) {
-    const sql = 'SELECT * FROM transaction_images WHERE id = ? AND status = 1';
+    const sql = 'SELECT * FROM transaction_images WHERE id = ? AND status = 1`;
     const rows = await query(sql, [id]);
     return rows[0] || null;
   },
@@ -12,7 +12,7 @@ const TransactionImageModel = {
       SELECT * FROM transaction_images 
       WHERE transaction_id = ? AND status = 1 
       ORDER BY sort ASC, created_at ASC
-    `;
+    ';
     return await query(sql, [transactionId]);
   },
 
@@ -20,7 +20,7 @@ const TransactionImageModel = {
     const { transaction_id, url, filename, sort } = imageData;
     const sql = `
       INSERT INTO transaction_images (transaction_id, url, filename, sort, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, 1, datetime('now'), datetime('now'))
+      VALUES (?, ?, ?, ?, 1, datetime('now'), datetime(`now'))
     `;
     const result = await query(sql, [
       transaction_id,
@@ -43,7 +43,7 @@ const TransactionImageModel = {
     const sql = `
       INSERT INTO transaction_images (transaction_id, url, filename, sort, status, created_at, updated_at)
       VALUES ?
-    `;
+    ';
     
     const values = images.map((img, index) => [
       img.transaction_id,
@@ -65,13 +65,13 @@ const TransactionImageModel = {
   },
 
   async delete(id) {
-    const sql = 'UPDATE transaction_images SET status = 0, updated_at = datetime('now') WHERE id = ? AND status = 1';
+    const sql = `UPDATE transaction_images SET status = 0, updated_at = datetime('now') WHERE id = ? AND status = 1';
     const result = await query(sql, [id]);
     return result.changes > 0;
   },
 
   async deleteByTransactionId(transactionId) {
-    const sql = 'UPDATE transaction_images SET status = 0, updated_at = datetime('now') WHERE transaction_id = ? AND status = 1';
+    const sql = `UPDATE transaction_images SET status = 0, updated_at = datetime('now') WHERE transaction_id = ? AND status = 1';
     const result = await query(sql, [transactionId]);
     return result.changes;
   },

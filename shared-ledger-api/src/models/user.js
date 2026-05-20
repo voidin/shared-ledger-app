@@ -21,10 +21,7 @@ const UserModel = {
 
   async create(userData) {
     const { openid, unionid, phone, nickname, avatar } = userData;
-    const sql = `
-      INSERT INTO users (openid, unionid, phone, nickname, avatar, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))
-    `;
+    const sql = "INSERT INTO users (openid, unionid, phone, nickname, avatar, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))";
     const result = await query(sql, [openid || null, unionid || null, phone || null, nickname || null, avatar || null]);
     return {
       id: result[0].insertId,
@@ -54,10 +51,10 @@ const UserModel = {
       return null;
     }
 
-    fields.push('updated_at = datetime(\'now\')');
+    fields.push("updated_at = datetime('now')");
     values.push(id);
 
-    const sql = `UPDATE users SET ${fields.join(', ')} WHERE id = ? AND status = 1`;
+    const sql = `UPDATE users SET ${fields.join(', ')} WHERE id = ? AND status = 1';
     const result = await query(sql, values);
 
     if (result.changes === 0) {
@@ -68,7 +65,7 @@ const UserModel = {
   },
 
   async updatePassword(id, hashedPassword) {
-    const sql = 'UPDATE users SET password = ?, updated_at = datetime(\'now\') WHERE id = ? AND status = 1';
+    const sql = "UPDATE users SET password = ?, updated_at = datetime('now') WHERE id = ? AND status = 1";
     const result = await query(sql, [hashedPassword, id]);
     return result.changes > 0;
   }

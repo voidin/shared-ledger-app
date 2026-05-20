@@ -2,7 +2,7 @@ const { query } = require('../config/database.js');
 
 const CategoryModel = {
   async findById(id) {
-    const sql = 'SELECT * FROM categories WHERE id = ? AND status = 1';
+    const sql = 'SELECT * FROM categories WHERE id = ? AND status = 1`;
     const rows = await query(sql, [id]);
     return rows[0] || null;
   },
@@ -30,7 +30,7 @@ const CategoryModel = {
         WHERE ledger_id IS NULL AND is_system = 1 AND status = 1
       ) AS combined
       ORDER BY is_system DESC, sort ASC, created_at ASC
-    `;
+    ';
     return await query(sql, [ledgerId]);
   },
 
@@ -38,8 +38,8 @@ const CategoryModel = {
     const { ledger_id, name, icon, color, sort, is_system } = categoryData;
     const sql = `
       INSERT INTO categories (ledger_id, name, icon, color, sort, is_system, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))
-    `;
+      VALUES (?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime(`now'))
+    ';
     const result = await query(sql, [
       ledger_id || null,
       name,
@@ -81,10 +81,10 @@ const CategoryModel = {
       return null;
     }
 
-    fields.push('updated_at = datetime('now')');
+    fields.push(`updated_at = datetime('now')`);
     values.push(id);
 
-    const sql = `UPDATE categories SET ${fields.join(', ')} WHERE id = ? AND status = 1`;
+    const sql = `UPDATE categories SET ${fields.join(', ')} WHERE id = ? AND status = 1';
     const result = await query(sql, values);
 
     if (result.changes === 0) {
@@ -95,7 +95,7 @@ const CategoryModel = {
   },
 
   async delete(id) {
-    const sql = 'UPDATE categories SET status = 0, updated_at = datetime('now') WHERE id = ? AND status = 1 AND is_system = 0';
+    const sql = `UPDATE categories SET status = 0, updated_at = datetime('now') WHERE id = ? AND status = 1 AND is_system = 0';
     const result = await query(sql, [id]);
     return result.changes > 0;
   },

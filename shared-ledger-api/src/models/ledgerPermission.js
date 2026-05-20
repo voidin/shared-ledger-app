@@ -17,7 +17,7 @@ const PermissionModel = {
       LEFT JOIN users u ON lp.user_id = u.id AND u.status = 1
       WHERE lp.ledger_id = ? AND lp.status = 1
       ORDER BY lp.role ASC, lp.created_at DESC
-    `;
+    ';
     const rows = await query(sql, [ledgerId]);
     return rows;
   },
@@ -40,8 +40,8 @@ const PermissionModel = {
         ledger_id, user_id, role, can_add, can_edit, can_delete, 
         can_reimburse, can_export, status, created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
-    `;
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime(`now'))
+    ';
     const result = await query(sql, [
       ledger_id, user_id, role, can_add, can_edit, can_delete,
       can_reimburse, can_export, status
@@ -100,15 +100,15 @@ const PermissionModel = {
       return null;
     }
 
-    fields.push('updated_at = datetime('now')');
+    fields.push(`updated_at = datetime('now')`);
     values.push(userId);
     values.push(ledgerId);
 
     const sql = `
       UPDATE ledger_permissions 
-      SET ${fields.join(', ')} 
+      SET ${fields.join(', `)} 
       WHERE user_id = ? AND ledger_id = ? AND status = 1
-    `;
+    ';
     const result = await query(sql, values);
 
     if (result.changes === 0) {
@@ -123,7 +123,7 @@ const PermissionModel = {
       UPDATE ledger_permissions 
       SET status = 0, updated_at = datetime('now') 
       WHERE user_id = ? AND ledger_id = ? AND status = 1
-    `;
+    ';
     const result = await query(sql, [userId, ledgerId]);
     return result.changes > 0;
   },
@@ -131,7 +131,7 @@ const PermissionModel = {
   async deleteByLedgerId(ledgerId) {
     const sql = `
       UPDATE ledger_permissions 
-      SET status = 0, updated_at = datetime('now') 
+      SET status = 0, updated_at = datetime(`now') 
       WHERE ledger_id = ? AND status = 1
     `;
     const result = await query(sql, [ledgerId]);
@@ -142,7 +142,7 @@ const PermissionModel = {
     const sql = `
       SELECT role FROM ledger_permissions 
       WHERE user_id = ? AND ledger_id = ? AND status = 1
-    `;
+    ';
     const rows = await query(sql, [userId, ledgerId]);
     if (rows.length === 0) {
       return false;
@@ -159,7 +159,7 @@ const PermissionModel = {
     return await transaction(async (conn) => {
       for (const perm of permissions) {
         const [existing] = await conn.execute(
-          'SELECT id FROM ledger_permissions WHERE user_id = ? AND ledger_id = ? AND status = 1',
+          'SELECT id FROM ledger_permissions WHERE user_id = ? AND ledger_id = ? AND status = 1`,
           [perm.user_id, ledgerId]
         );
 
@@ -177,7 +177,7 @@ const PermissionModel = {
             `INSERT INTO ledger_permissions 
              (ledger_id, user_id, role, can_add, can_edit, can_delete, 
               can_reimburse, can_export, status, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))`,
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, datetime(`now'), datetime('now'))`,
             [ledgerId, perm.user_id, perm.role, perm.can_add, perm.can_edit,
              perm.can_delete, perm.can_reimburse, perm.can_export]
           );

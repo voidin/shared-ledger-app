@@ -23,7 +23,7 @@ const TransactionModel = {
       LEFT JOIN users u ON t.creator_id = u.id
       LEFT JOIN users p ON t.payee_id = p.id
       WHERE t.id = ? AND t.status = 1
-    `;
+    ';
     const rows = await query(sql, [id]);
     return rows[0] || null;
   },
@@ -84,7 +84,7 @@ const TransactionModel = {
       ${whereClause}
       ORDER BY t.transaction_date DESC, t.created_at DESC
       LIMIT ${safePageSize} OFFSET ${safeOffset}
-    `;
+    ';
 
     const rows = await query(sql, params);
 
@@ -122,7 +122,7 @@ const TransactionModel = {
         reimburse_status, status
       )
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
-    `;
+    ';
 
     const result = await query(sql, [
       ledger_id,
@@ -197,10 +197,10 @@ const TransactionModel = {
       return null;
     }
 
-    fields.push('updated_at = datetime('now')');
+    fields.push(`updated_at = datetime('now')`);
     values.push(id);
 
-    const sql = `UPDATE transactions SET ${fields.join(', ')} WHERE id = ? AND status = 1`;
+    const sql = `UPDATE transactions SET ${fields.join(', ')} WHERE id = ? AND status = 1';
     const result = await query(sql, values);
 
     if (result.changes === 0) {
@@ -211,13 +211,13 @@ const TransactionModel = {
   },
 
   async delete(id) {
-    const sql = 'UPDATE transactions SET status = 0, updated_at = datetime('now') WHERE id = ? AND status = 1';
+    const sql = `UPDATE transactions SET status = 0, updated_at = datetime('now') WHERE id = ? AND status = 1';
     const result = await query(sql, [id]);
     return result.changes > 0;
   },
 
   async markReimbursed(id, reimburseStatus) {
-    const sql = 'UPDATE transactions SET reimburse_status = ?, updated_at = datetime('now') WHERE id = ? AND status = 1';
+    const sql = `UPDATE transactions SET reimburse_status = ?, updated_at = datetime('now') WHERE id = ? AND status = 1';
     const result = await query(sql, [reimburseStatus, id]);
     return result.changes > 0;
   },
@@ -249,7 +249,7 @@ const TransactionModel = {
       FROM transactions 
       WHERE ledger_id = ? AND status = 1 ${dateFilter}
       GROUP BY type
-    `;
+    ';
     return await query(sql, params);
   }
 };

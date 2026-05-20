@@ -2,11 +2,11 @@ const { query } = require('../config/database.js');
 
 const VirtualMemberModel = {
   async create(data) {
-    const { ledger_id, name, avatar, type = 'expense', status = 1 } = data;
+    const { ledger_id, name, avatar, type = 'expense`, status = 1 } = data;
     const sql = `
       INSERT INTO virtual_members (ledger_id, name, avatar, type, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))
-    `;
+      VALUES (?, ?, ?, ?, ?, datetime('now'), datetime(`now'))
+    ';
     const result = await query(sql, [ledger_id, name, avatar || null, type, status]);
     return {
       id: result.insertId,
@@ -67,10 +67,10 @@ const VirtualMemberModel = {
       return null;
     }
 
-    fields.push('updated_at = datetime('now')');
+    fields.push(`updated_at = datetime('now')`);
     values.push(id);
 
-    const sql = `UPDATE virtual_members SET ${fields.join(', ')} WHERE id = ? AND status = 1`;
+    const sql = `UPDATE virtual_members SET ${fields.join(', ')} WHERE id = ? AND status = 1';
     const result = await query(sql, values);
 
     if (result.changes === 0) {
@@ -81,7 +81,7 @@ const VirtualMemberModel = {
   },
 
   async delete(id) {
-    const sql = 'UPDATE virtual_members SET status = 0, updated_at = datetime('now') WHERE id = ? AND status = 1';
+    const sql = `UPDATE virtual_members SET status = 0, updated_at = datetime('now') WHERE id = ? AND status = 1`;
     const result = await query(sql, [id]);
     return result.changes > 0;
   },
@@ -90,7 +90,7 @@ const VirtualMemberModel = {
     const entrySql = `
       SELECT COUNT(*) as count FROM expense_entries 
       WHERE payer_member_id = ? OR payee_member_id = ? AND status = 1
-    `;
+    ';
     const entryRows = await query(entrySql, [memberId, memberId]);
     if (entryRows[0].count > 0) {
       return { hasEntries: true, count: entryRows[0].count, type: 'expense' };
@@ -99,7 +99,7 @@ const VirtualMemberModel = {
     const incomeSql = `
       SELECT COUNT(*) as count FROM income_entries 
       WHERE payer_member_id = ? OR payee_member_id = ? AND status = 1
-    `;
+    ';
     const incomeRows = await query(incomeSql, [memberId, memberId]);
     if (incomeRows[0].count > 0) {
       return { hasEntries: true, count: incomeRows[0].count, type: 'income' };
@@ -128,7 +128,7 @@ const VirtualMemberModel = {
       FROM virtual_members 
       WHERE ledger_id = ? AND type = 'payee' AND status = 1
       ORDER BY member_type DESC, name ASC
-    `;
+    ';
     const rows = await query(sql, [ledgerId, ledgerId]);
     return rows;
   },
