@@ -126,7 +126,7 @@ const showPrivacyModal = ref(false)
 let countdownTimer = null
 
 const canLogin = computed(() => {
-  return phone.value.length === 11 && code.value.length === 4 && agreed.value.length > 0
+  return phone.value.length === 11 && code.value.length === 6 && agreed.value.length > 0
 })
 
 const formatPhone = (value) => {
@@ -175,7 +175,7 @@ const handleLogin = async () => {
     userStore.login({
       phone: phone.value,
       token: data.token,
-      userInfo: data.userInfo
+      userInfo: data.user
     })
 
     const redirect = route.query.redirect || '/'
