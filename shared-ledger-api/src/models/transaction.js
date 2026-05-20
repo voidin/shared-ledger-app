@@ -4,50 +4,56 @@ const TransactionModel = {
   async create(transactionData) {
     const { 
       ledger_id, 
-      type, 
+      user_id,
+      type = 1, 
       amount, 
-      category_id, 
-      category_name, 
-      description, 
-      transacted_at, 
-      created_by, 
-      image_urls = null
+      category_id,
+      category_name,
+      remark,
+      transaction_date,
+      payee_id,
+      is_virtual_payee = 0,
+      reimburse_status = 0
     } = transactionData;
     
-    const sql = "INSERT INTO transactions (ledger_id, type, amount, category_id, category_name, description, transacted_at, created_by, image_urls, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))";
+    const sql = "INSERT INTO transactions (ledger_id, user_id, type, amount, category_id, category_name, remark, transaction_date, payee_id, is_virtual_payee, reimburse_status, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))";
     const result = await query(sql, [
-      ledger_id, type, amount, category_id || null, 
-      category_name || null, description || null, 
-      transacted_at, created_by, JSON.stringify(image_urls || [])
+      ledger_id, 
+      user_id, 
+      type, 
+      amount.toString(), 
+      category_id || null, 
+      category_name || null, 
+      remark || null, 
+      transaction_date || new Date().toISOString().split('T')[0], 
+      payee_id || null, 
+      is_virtual_payee, 
+      reimburse_status
     ]);
     
     return this.findById(result[0].insertId);
   },
 
   async findById(id) {
-    const sql = "SELECT t.*, u.nickname as creator_nickname, u.avatar as creator_avatar FROM transactions t LEFT JOIN users u ON t.created_by = u.id WHERE t.id = ? AND t.status = 1";
+    const sql = "SELECT * FROM transactions WHERE id = ? AND status = 1";
     const rows = await query(sql, [id]);
     return rows[0] || null;
   },
 
   async findByLedgerId(ledger_id, options = {}) {
-    let sql = "SELECT t.*, u.nickname as creator_nickname, u.avatar as creator_avatar FROM transactions t LEFT JOIN users u ON t.created_by = u.id WHERE t.ledger_id = ? AND t.status = 1";
+    let sql = "SELECT * FROM transactions WHERE ledger_id = ? AND status = 1";
     const params = [ledger_id];
     
-    if (options.type) {
-      sql += " AND t.type = ?";
+    if (options.type !== undefined) {
+      sql += " AND type = ?";
       params.push(options.type);
     }
     if (options.category_id) {
-      sql += " AND t.category_id = ?";
+      sql += " AND category_id = ?";
       params.push(options.category_id);
     }
-    if (options.keyword) {
-      sql += " AND (t.description LIKE ? OR t.category_name LIKE ?)";
-      params.push('%' + options.keyword + '%', '%' + options.keyword + '%');
-    }
     
-    sql += " ORDER BY t.transacted_at DESC, t.created_at DESC";
+    sql += " ORDER BY transaction_date DESC, created_at DESC";
     
     if (options.limit) {
       sql += " LIMIT ?";
@@ -72,7 +78,7 @@ const TransactionModel = {
     }
     if (updateData.amount !== undefined) {
       fields.push('amount = ?');
-      values.push(updateData.amount);
+      values.push(updateData.amount.toString());
     }
     if (updateData.category_id !== undefined) {
       fields.push('category_id = ?');
@@ -82,17 +88,13 @@ const TransactionModel = {
       fields.push('category_name = ?');
       values.push(updateData.category_name);
     }
-    if (updateData.description !== undefined) {
-      fields.push('description = ?');
-      values.push(updateData.description);
+    if (updateData.remark !== undefined) {
+      fields.push('remark = ?');
+      values.push(updateData.remark);
     }
-    if (updateData.transacted_at !== undefined) {
-      fields.push('transacted_at = ?');
-      values.push(updateData.transacted_at);
-    }
-    if (updateData.image_urls !== undefined) {
-      fields.push('image_urls = ?');
-      values.push(JSON.stringify(updateData.image_urls || []));
+    if (updateData.transaction_date !== undefined) {
+      fields.push('transaction_date = ?');
+      values.push(updateData.transaction_date);
     }
     
     if (fields.length === 0) {
@@ -123,11 +125,11 @@ const TransactionModel = {
     const params = [ledger_id];
     
     if (startDate) {
-      sql += " AND transacted_at >= ?";
+      sql += " AND transaction_date >= ?";
       params.push(startDate);
     }
     if (endDate) {
-      sql += " AND transacted_at <= ?";
+      sql += " AND transaction_date <= ?";
       params.push(endDate);
     }
     

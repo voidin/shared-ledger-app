@@ -3,17 +3,19 @@ const crypto = require('crypto');
 
 const LedgerModel = {
   async create(ledgerData) {
-    const { name, description, type, creator_id, auto_lock_days } = ledgerData;
+    const { name, description, type, creatorId, autoLockDays } = ledgerData;
     const invite_code = crypto.randomBytes(6).toString('hex').substring(0, 12);
     
     const sql = "INSERT INTO ledgers (name, description, type, invite_code, creator_id, auto_lock_days, is_locked, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, 0, 1, datetime('now'), datetime('now'))";
-    const result = await query(sql, [name, description || null, type || 1, invite_code, creator_id, auto_lock_days || null]);
+    const result = await query(sql, [name, description || null, type || 1, invite_code, creatorId, autoLockDays || null]);
     
     const newLedger = await this.findById(result[0].insertId);
     
-    await this.addMember(newLedger.id, creator_id, 1);
-    
     return newLedger;
+  },
+
+  async findUserLedgers(userId) {
+    return await this.findByUserId(userId);
   },
 
   async findById(id) {

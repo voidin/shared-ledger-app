@@ -10,6 +10,7 @@ const transactionController = {
       console.log('Controller - ledgerId:', ledgerId, 'userId:', userId);
       const {
         category_id,
+        category_name,
         amount,
         type,
         transaction_date,
@@ -20,7 +21,7 @@ const transactionController = {
         images
       } = req.body;
 
-      if (!category_id) {
+      if (!category_id && !category_name) {
         return error(res, '分类不能为空', 400);
       }
 
@@ -34,13 +35,12 @@ const transactionController = {
 
       const transaction = await TransactionModel.create({
         ledger_id: ledgerId,
-        creator_id: userId,
         user_id: userId,
-        category_id,
+        category_id: category_id || null,
+        category_name: category_name || null,
         amount,
         type,
         transaction_date,
-        description: '',
         remark: remark || null,
         payee_id: payee_id || null,
         is_virtual_payee: is_virtual_payee || 0,
