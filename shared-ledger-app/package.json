@@ -1,0 +1,26 @@
+{
+  "name": "shared-ledger-app",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.3.4",
+    "pinia": "^2.1.6",
+    "vue-router": "^4.2.4",
+    "axios": "^1.5.0",
+    "@vueuse/core": "^10.3.0",
+    "dayjs": "^1.11.9",
+    "vant": "^4.7.2"
+  },
+  "devDependencies": {
+    "vite": "^4.4.9",
+    "@vitejs/plugin-vue": "^4.3.4",
+    "autoprefixer": "^10.4.15",
+    "postcss": "^8.4.28"
+  }
+}
